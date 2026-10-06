@@ -1,0 +1,24 @@
+# Cabeceras de la landing en Cloudflare (Workers con archivos estáticos).
+# Cloudflare lee este fichero y NO lo sirve. Equivale a nginx/cabeceras.conf,
+# que es el del VPS: scripts/comprobar.mjs (en la CI) falla si no dicen lo
+# mismo. Las respuestas de /api/* las pone el Worker (worker/index.js).
+# El HTML se revalida siempre (lo que hace Cloudflare por defecto).
+
+/*
+  Content-Security-Policy: default-src 'none'; script-src 'self' https://challenges.cloudflare.com; style-src 'self'; font-src 'self'; img-src 'self' data: https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org; connect-src 'self'; frame-src https://challenges.cloudflare.com; manifest-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'; object-src 'none'; upgrade-insecure-requests
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+
+/fonts/*
+  Cache-Control: public, max-age=2592000, immutable
+
+/vendor/*
+  Cache-Control: public, max-age=2592000, immutable
+
+/img/*
+  Cache-Control: public, max-age=86400

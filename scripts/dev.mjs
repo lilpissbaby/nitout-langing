@@ -60,6 +60,8 @@ const SEGURIDAD = leerCabeceras()
 
 async function servirEstatico(req, res) {
   const ruta = decodeURIComponent(new URL(req.url, 'http://x').pathname)
+  // Como Cloudflare y nginx: ni _headers ni ficheros ocultos.
+  if (ruta === '/_headers' || /\/\./.test(ruta)) return no404(res)
   let fichero = normalize(join(PUBLICO, ruta))
   if (fichero !== PUBLICO && !fichero.startsWith(PUBLICO + sep)) return responder(res, 403, 'Fuera de public/')
   try {
@@ -71,10 +73,14 @@ async function servirEstatico(req, res) {
     res.writeHead(200, { ...SEGURIDAD, 'Content-Type': TIPOS[ext] ?? 'application/octet-stream', 'Cache-Control': 'no-cache' })
     res.end(req.method === 'HEAD' ? undefined : cuerpo)
   } catch {
-    const cuerpo = await readFile(join(PUBLICO, '404.html')).catch(() => 'No encontrado')
-    res.writeHead(404, { ...SEGURIDAD, 'Content-Type': TIPOS['.html'] })
-    res.end(cuerpo)
+    return no404(res)
   }
+}
+
+async function no404(res) {
+  const cuerpo = await readFile(join(PUBLICO, '404.html')).catch(() => 'No encontrado')
+  res.writeHead(404, { ...SEGURIDAD, 'Content-Type': TIPOS['.html'] })
+  res.end(cuerpo)
 }
 
 /* ---------------- la API: lo mismo que deja pasar nginx ---------------- */
@@ -165,6 +171,10 @@ http
     })
     if (req.url.startsWith('/api/')) {
       if (!rutaPermitida(req)) return responder(res, 404, JSON.stringify({ error: { codigo: 'no_encontrado', mensaje: 'La landing no usa esa ruta' } }), 'application/json')
+      // Como el Worker: el formulario sólo desde esta misma web.
+      if (req.method === 'POST' && req.headers.origin !== `http://${req.headers.host}`) {
+        return responder(res, 403, JSON.stringify({ error: { codigo: 'sin_permiso', mensaje: 'Petición desde un origen no permitido' } }), 'application/json')
+      }
       return API ? reenviarApi(req, res) : apiDeMentira(req, res)
     }
     if (req.method !== 'GET' && req.method !== 'HEAD') return responder(res, 405, 'Sólo GET')

@@ -77,6 +77,8 @@ server {
     location ~* ^/(phpmyadmin|pma|adminer|cgi-bin|autoload) { return 444; }
     location ~* \.(php|asp|aspx|jsp|cgi|sh|sql|bak|old|swp)$ { return 444; }
     location ~ /\. { return 444; }
+    # public/_headers es la configuración de Cloudflare: aquí no se sirve.
+    location = /_headers { return 404; }
 
     gzip on;
     gzip_vary on;

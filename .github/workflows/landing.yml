@@ -1,0 +1,193 @@
+# ======================================================================
+#  nitout-landing · de main a Cloudflare (nitout.com)
+#
+#  Pull request  ->  verificar
+#  Push a main   ->  verificar  ->  desplegar  ->  humo  (y revertir si falla)
+#
+#  Lo mismo que el CI de api-fiestas. Hay que crear en GitHub (Settings >
+#  Environments > "produccion"):
+#
+#    Secretos
+#      CLOUDFLARE_API_TOKEN    token de la cuenta (README → Cloudflare, paso 2):
+#                              Workers Admin + Workers Routes Write en nitout.com
+#      CLOUDFLARE_ACCOUNT_ID   el id de la cuenta de Cloudflare
+#
+#    Variable (no secreto), opcional
+#      DOMINIO                 dónde se despliega, sin https://. Por defecto
+#                              nitout.com. Cambiarla no obliga a tocar este fichero.
+#
+#  wrangler va con la versión FIJADA (la misma que usa api-fiestas) y con
+#  npx, sin la acción cloudflare/wrangler-action: una dependencia menos con
+#  acceso al token. El frontend no tiene npm: wrangler sólo se usa aquí.
+# ======================================================================
+
+name: CI · landing
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**.md']
+  pull_request:
+    branches: [main]
+    paths-ignore: ['**.md']
+  workflow_dispatch:
+
+# Dos despliegues a la vez dejan producción en un estado que nadie sabe cuál es.
+concurrency:
+  group: landing-produccion
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  WRANGLER: wrangler@4.131.2
+  WRANGLER_SEND_METRICS: 'false'
+
+jobs:
+  # --------------------------------------------------------------------
+  #  1. Verificar: lo que rompería el CSP o la seguridad sin que se note
+  #     al abrir la página, el Worker y la página servida en local.
+  # --------------------------------------------------------------------
+  verificar:
+    name: Comprobaciones y pruebas
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Un secreto que se cuela en un commit ya no se quita del historial.
+      - name: Que no haya secretos en el repo
+        run: |
+          if git ls-files --error-unmatch .env .dev.vars 2>/dev/null; then
+            echo "::error::Hay un .env o un .dev.vars versionado. Sácalo con git rm --cached y cambia lo que hubiera dentro."
+            exit 1
+          fi
+          echo "ok: ni .env ni .dev.vars están versionados"
+
+      - name: Sintaxis del JS
+        run: |
+          for f in public/js/*.js worker/index.js; do
+            node --input-type=module --check < "$f" || { echo "::error file=$f::error de sintaxis"; exit 1; }
+          done
+          for f in scripts/*.mjs worker/*.mjs; do node --check "$f"; done
+          echo "ok"
+
+      # Inline, CSP igual en nginx y en _headers, las 4 rutas, iconos, logos de ejemplo.
+      - name: Comprobaciones estáticas
+        run: node scripts/comprobar.mjs
+
+      - name: Pruebas del Worker
+        run: node --test worker/index.test.mjs
+
+      # La página tal cual, con el mismo CSP y una API de mentira.
+      - name: Humo en local
+        run: |
+          node scripts/dev.mjs > /tmp/dev.log 2>&1 &
+          for i in $(seq 1 20); do curl -sf http://127.0.0.1:3001/ > /dev/null && break; sleep 0.5; done
+          node scripts/humo.mjs http://127.0.0.1:3001 --local
+
+      # Que wrangler entiende la configuración y empaqueta el Worker, sin subir nada.
+      - name: wrangler deploy --dry-run
+        run: npx --yes "$WRANGLER" deploy --dry-run --outdir /tmp/dist
+
+  # --------------------------------------------------------------------
+  #  2. Desplegar. Sólo en main y sólo si lo de arriba pasó.
+  # --------------------------------------------------------------------
+  desplegar:
+    name: Desplegar a Cloudflare
+    needs: verificar
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    # En el entorno van los secretos. Si queréis que alguien apruebe cada
+    # despliegue, se activa ahí con "Required reviewers", sin tocar esto.
+    environment:
+      name: produccion
+      url: https://${{ vars.DOMINIO || 'nitout.com' }}
+
+    outputs:
+      version_anterior: ${{ steps.anterior.outputs.id }}
+
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      DOMINIO: ${{ vars.DOMINIO || 'nitout.com' }}
+      # Por variable de entorno y no dentro del script: un mensaje de commit
+      # con comillas o $(…) no puede colarse en el shell.
+      COMMIT: ${{ github.event.head_commit.message }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Comprobar la configuración
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error::Faltan CLOUDFLARE_API_TOKEN o CLOUDFLARE_ACCOUNT_ID en el entorno produccion (README → Cloudflare)."
+            exit 1
+          fi
+          if ! [[ "$DOMINIO" =~ ^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$ ]]; then
+            echo "::error::La variable DOMINIO no parece un dominio: '$DOMINIO'"
+            exit 1
+          fi
+          echo "desplegando en https://$DOMINIO"
+
+      # La versión que hay AHORA, para volver a ella si el humo dice que la
+      # nueva no vale. La primera vez no hay ninguna y no pasa nada.
+      - name: Apuntar la versión actual
+        id: anterior
+        run: |
+          id=$(npx --yes "$WRANGLER" versions list --json 2>/dev/null | node -e \
+            "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{console.log(JSON.parse(d)[0]?.id??'')}catch{console.log('')}})")
+          echo "id=$id" >> "$GITHUB_OUTPUT"
+          echo "versión antes de desplegar: ${id:-ninguna}"
+
+      - name: wrangler deploy
+        run: |
+          mensaje="$(printf '%s' "${COMMIT:-despliegue manual}" | head -n1 | cut -c1-80)"
+          npx --yes "$WRANGLER" deploy --domain "$DOMINIO" --message "${GITHUB_SHA::7} · $mensaje"
+
+  # --------------------------------------------------------------------
+  #  3. Humo contra el dominio de verdad. Si falla, se vuelve a la anterior.
+  # --------------------------------------------------------------------
+  humo:
+    name: Comprobar producción
+    needs: desplegar
+    runs-on: ubuntu-latest
+    environment:
+      name: produccion
+      url: https://${{ vars.DOMINIO || 'nitout.com' }}
+    env:
+      DOMINIO: ${{ vars.DOMINIO || 'nitout.com' }}
+      ANTERIOR: ${{ needs.desplegar.outputs.version_anterior }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Cloudflare tarda unos segundos en tener la versión nueva en todo el borde.
+      - name: Esperar a que propague
+        run: sleep 20
+
+      - name: Comprobaciones de humo
+        run: node scripts/humo.mjs "https://$DOMINIO" --produccion
+
+      # --message evita que wrangler pida confirmación por teclado.
+      - name: Revertir
+        if: failure() && env.ANTERIOR != ''
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          npx --yes "$WRANGLER" rollback "$ANTERIOR" --message "humo fallido en ${GITHUB_SHA::7}: vuelta a la anterior"
+          echo "::warning::Producción ha vuelto a la versión $ANTERIOR. Mira el paso «Comprobaciones de humo»."

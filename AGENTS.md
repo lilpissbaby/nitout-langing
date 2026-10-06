@@ -16,7 +16,13 @@ Reglas que no se negocian:
 - Todo HTML generado pasa por la plantilla `html` de `js/util.js` (escapa por defecto).
 - A la API sólo van `GET /api/eventos`, `GET /api/planes`, `GET /api/imagenes/<id>`
   y `POST /api/contacto`. Una ruta nueva se añade a la vez en
-  `nginx/landing.conf.template`, `scripts/dev.mjs` y `scripts/humo.mjs`.
+  `worker/index.js` (Cloudflare), `nginx/landing.conf.template` (VPS),
+  `scripts/dev.mjs` y `scripts/humo.mjs`.
+- Las cabeceras viven en dos sitios: `public/_headers` (Cloudflare) y
+  `nginx/cabeceras.conf` (VPS). Se cambian a la vez; `scripts/comprobar.mjs`
+  falla si no coinciden.
+- Antes de dar algo por bueno: `node scripts/comprobar.mjs`,
+  `node --test worker/index.test.mjs` y `humo.mjs --local` (lo mismo que la CI).
 - Los logos de `js/logos.js` con `ejemplo: true` no salen nunca en producción.
   No se añade el logo de nadie sin su permiso.
 - Prueba con `node scripts/dev.mjs` a 390×844 y a 1440×900, en claro y oscuro.

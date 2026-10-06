@@ -4,6 +4,19 @@ La página de presentación de nit out. La app (lo que hoy es
 `kedada.tenebrum.online`) pasa a `app.nitout.com`; esta landing va en
 `nitout.com`.
 
+**Dónde corre:**
+
+| | Producción · `nitout.com` | Pruebas · `nitout.tenebrum.online` |
+|---|---|---|
+| Qué | Cloudflare Workers con archivos estáticos | Contenedor nginx en el VPS |
+| Cabeceras | `public/_headers` | `nginx/cabeceras.conf` |
+| Puerta a la API | `worker/index.js` | `nginx/landing.conf.template` |
+| Cómo se sube | la CI, al hacer push a `main` | `git pull` + `docker compose up -d` |
+
+Los dos sirven la misma carpeta `public/` y dejan pasar las mismas cuatro
+rutas de la API. `scripts/comprobar.mjs` hace fallar la CI si las cabeceras
+o las rutas de un sitio y del otro dejan de coincidir.
+
 - **HTML, CSS y JS a pelo.** Sin frameworks, sin build y sin CDN. Fuentes,
   Leaflet e iconos se sirven desde aquí.
 - **Mismo estilo que la app** (Pegatina). Manda `kedada/DISENO.md`; lo propio
@@ -33,24 +46,36 @@ public/
   js/despegar.js        el detalle de cursor: la pegatina se levanta hacia el ratón
   img/logos/*.svg       logos de ENTIDADES INVENTADAS (maqueta)
   og.png                imagen al compartir el enlace (1200×630)
+  _headers              CSP y cabeceras en Cloudflare (Cloudflare lo lee y no lo sirve)
+worker/
+  index.js              el Worker de /api/*: deja pasar las 4 rutas a app.nitout.com
+  index.test.mjs        sus pruebas (node --test worker/index.test.mjs)
+wrangler.jsonc          configuración de Cloudflare (sin dominio: lo pone la CI)
+.github/workflows/
+  landing.yml           CI: verificar → desplegar → humo, y vuelta atrás si falla
 nginx/
-  landing.conf.template servidor + proxy de las 4 rutas de la API
-  cabeceras.conf        CSP y cabeceras de seguridad (las lee también dev.mjs)
+  landing.conf.template servidor + proxy de las 4 rutas de la API (VPS)
+  cabeceras.conf        CSP y cabeceras en el VPS (las lee también dev.mjs)
   proxy-api.conf        cómo se reenvía a la API (sin cookies ni Authorization)
 scripts/
   dev.mjs               servidor local con el mismo CSP; API de mentira si no le das una
-  humo.mjs              prueba de humo contra un despliegue
-docker-compose.yml      nginx:1.27-alpine, sin puertos, en proxy_network
+  comprobar.mjs         comprobaciones estáticas (inline, CSP, rutas, iconos, logos)
+  humo.mjs              prueba de humo contra un despliegue (o el local, con --local)
+docker-compose.yml      nginx:1.27-alpine, sin puertos, en proxy_network (VPS)
 ```
 
 ## Lo que la landing pide a la API
 
-| Ruta | Para qué | En nginx |
-|---|---|---|
-| `GET /api/eventos` | El mapa «en directo» | Sin cookies ni Origin; 5 por segundo por IP |
-| `GET /api/planes` | Precios, anuncio y si hay pagos | Caché de 5 minutos |
-| `GET /api/imagenes/<id>` | Las fotos de las pegatinas | Caché de 30 días |
-| `POST /api/contacto` | El formulario | Sólo POST, 8 KB, 6 por minuto por IP |
+| Ruta | Para qué | En Cloudflare (Worker) | En el VPS (nginx) |
+|---|---|---|---|
+| `GET /api/eventos` | El mapa «en directo» | Sin cookies, Origin ni `X-Forwarded-For` | Lo mismo; 5 por segundo por IP |
+| `GET /api/planes` | Precios, anuncio y si hay pagos | Caché de 5 minutos en el borde | Caché de 5 minutos |
+| `GET /api/imagenes/<id>` | Las fotos de las pegatinas | Caché de 30 días en el borde | Caché de 30 días |
+| `POST /api/contacto` | El formulario | Sólo desde la propia web, JSON, 8 KB | Sólo POST, 8 KB, 6 por minuto por IP |
+
+En Cloudflare, el Worker llama a `https://app.nitout.com/api/…`. Está en la
+misma zona que `nitout.com`, así que la API sigue viendo la IP real de quien
+visita (`CF-Connecting-IP`), y sus límites por IP funcionan igual.
 
 El endpoint de contacto está en `api-fiestas` (`src/modulos/contacto/`), con
 13 pruebas. El correo llega a `CORREO_CONTACTO` con «Responder» a quien
@@ -92,6 +117,13 @@ API=http://localhost:8787 node scripts/dev.mjs
 En PowerShell: `$env:API = 'http://localhost:8787'; node scripts/dev.mjs`.
 
 Mira la consola del navegador: cualquier aviso de CSP es un fallo.
+
+Antes de subir algo, lo mismo que pasa la CI:
+```bash
+node scripts/comprobar.mjs
+node --test worker/index.test.mjs
+node scripts/humo.mjs http://127.0.0.1:3001 --local    # con dev.mjs arrancado
+```
 
 ---
 
@@ -160,47 +192,94 @@ node scripts/humo.mjs https://nitout.tenebrum.online
 Tiene que acabar con «Todo en orden». Después abre la web, rellena el
 formulario una vez y mira que el correo llega a `hola@`.
 
-### Parte 3 · Producción (nitout.com)
+### Parte 3 · Producción en Cloudflare (nitout.com)
 
-> Ojo: hoy el túnel manda `nitout.com` a la app (`kedada:80`). Esta parte
-> mueve la app a `app.nitout.com`, así que hay que hacer **a la vez** la
-> mudanza de la app (lista de abajo). Si no, se rompe el login.
+Va directa a `nitout.com`. Hoy ese nombre lo usa la app a través del túnel,
+y Cloudflare no deja poner un Worker en un nombre que ya tiene un registro
+CNAME. Por eso **el primer paso es mover la app**.
 
-1. En el VPS de producción, clona el repo en `/opt/nitout/nitout-landing`, con
-   su propia deploy key de **sólo lectura** (como en la Parte 10.1 de
-   `produccion-paso-a-paso.md`).
-2. `.env`:
-   ```
-   API_UPSTREAM=api-fiestas:8787
-   API_ESQUEMA=http
-   APP_URL=https://app.nitout.com
-   ROBOTS=all
-   ```
-   Después: `docker compose up -d`.
-3. En Cloudflare → Tunnels → `nitout-prod` → **Public hostnames**:
+**3.1 · Mover la app a app.nitout.com.** Sigue la lista «La mudanza» de más
+abajo. Lo mínimo para seguir:
+1. En Cloudflare → Tunnels → `nitout-prod` → **Public hostnames**, añade `app`
+   · `nitout.com` → **HTTP** · `kedada:80`.
+2. Pon en el `.env` de la API `ORIGEN_WEB=https://app.nitout.com` y
+   `GOOGLE_REDIRECT_URI=https://app.nitout.com/api/sesion/google/callback`.
+   En Google Cloud, añade esas mismas direcciones.
+3. En el túnel, **borra** la ruta de `nitout.com` (la de `www` puede quedarse:
+   la regla de redirección a `nitout.com` va antes). En **DNS → Records**,
+   comprueba que ya no hay ningún registro `nitout.com` (el CNAME del túnel).
+   **No borres los MX ni los TXT.**
 
-   | Subdomain | Domain | Service |
-   |---|---|---|
-   | *(vacío)* | `nitout.com` | **HTTP** · `nitout-landing:80` |
-   | `www` | `nitout.com` | **HTTP** · `nitout-landing:80` |
-   | `app` | `nitout.com` | **HTTP** · `kedada:80` |
+**✅ Comprueba:** `https://app.nitout.com` abre la app y puedes entrar con tu
+cuenta. `https://nitout.com` da error (aún no hay nada): es lo esperado.
 
-   La regla de `www` → `nitout.com` que ya tienes se queda como está.
-4. En el `.env` de la API: `ORIGEN_LANDING=https://nitout.com`, la Secret Key
-   real de Turnstile y `ORIGEN_WEB=https://app.nitout.com` (mudanza).
-5. Turnstile de verdad: Cloudflare → **Turnstile → Add widget**, dominio
-   `nitout.com`, modo **Managed**. La Site Key va en `js/config.js` y la
-   Secret Key en el `.env` de la API.
-6. En Cloudflare → **Analytics → Web Analytics**, deja **apagada** la
-   inyección automática: el CSP la bloquearía. Las visitas se ven igual en
-   Analytics del dominio.
-7. Google Search Console: añade `https://nitout.com/sitemap.xml`.
+**3.2 · La API, para la landing.** En el `.env` de la API de producción:
+```
+CORREO_CONTACTO=hola@nitout.com
+ORIGEN_LANDING=https://nitout.com
+TURNSTILE_SECRETO=…            # la Secret Key del paso 3.6 (o déjalo para luego)
+```
+Después: `docker compose up -d --build`.
 
-**✅ Comprueba:** `node scripts/humo.mjs https://nitout.com --produccion`.
+**3.3 · El token para la CI.** En Cloudflare → tu perfil → **API Tokens →
+Create Token → plantilla «Edit Cloudflare Workers»**.
+- **Account Resources:** sólo tu cuenta.
+- **Zone Resources:** sólo `nitout.com`.
+- Tiene que llevar **Workers** con permiso para **crear** Workers (Admin o
+  «Workers Scripts: Edit») y **Zone → Workers Routes → Edit**. Sin el
+  segundo no puede poner el dominio.
+
+Copia el token: sólo se ve una vez. El **Account ID** está en **Workers &
+Pages**, en la columna de la derecha.
+
+**3.4 · GitHub.** En el repo → **Settings → Environments → New environment**,
+con el nombre `produccion`. Dentro, en **Environment secrets**:
+- `CLOUDFLARE_API_TOKEN` (el del paso 3.3)
+- `CLOUDFLARE_ACCOUNT_ID`
+
+No hace falta la variable `DOMINIO`: por defecto es `nitout.com`.
+
+**3.5 · Primer despliegue.** Haz push a `main`, o lánzalo a mano desde
+**Actions → CI · landing → Run workflow**. Verás tres pasos:
+1. **verificar:** comprobaciones, pruebas del Worker y humo en local;
+2. **desplegar:** `wrangler deploy --domain nitout.com`, que crea el Worker y
+   el dominio con su certificado;
+3. **humo:** `scripts/humo.mjs https://nitout.com --produccion`. Si falla y
+   había una versión anterior, vuelve sola a ella.
+
+**✅ Comprueba:** los tres en verde, y `https://nitout.com` enseña la landing.
+
+**3.6 · Turnstile** (cuando quieras). En Cloudflare → **Turnstile → Add widget**:
+dominio `nitout.com`, modo **Managed**.
+- La **Site Key** va en `public/js/config.js` → `TURNSTILE_SITEKEY` (push y se despliega).
+- La **Secret Key** va en el `.env` de la API (paso 3.2).
+
+**3.7 · Ajustes de la zona que chocan con el CSP:**
+- **Speed → Rocket Loader:** apagado (reescribe los `<script>`).
+- **Analytics → Web Analytics:** sin la inyección automática para `nitout.com`.
+  Las visitas se siguen viendo en la analítica de la zona.
+- **Scrape Shield → Email Address Obfuscation:** puede quedarse. Su script es
+  del mismo dominio y el CSP lo deja pasar.
+
+**3.8 · Buscadores.** En Google Search Console, añade `https://nitout.com/sitemap.xml`.
+
+**Si algo falla:**
+
+| Qué ves | Qué pasa | Qué hacer |
+|---|---|---|
+| `desplegar` falla con «existing CNAME» o «already has externally managed DNS records» | Sigue el registro del túnel en `nitout.com` | Paso 3.1, punto 3 |
+| `desplegar` falla con «Authentication error» o «No access» | Al token le falta un permiso | Paso 3.3: Workers (crear) y Workers Routes Edit en `nitout.com` |
+| `humo` falla en `/api/planes` con 502 | El Worker no llega a `app.nitout.com` | Paso 3.1, punto 1 |
+| `humo` falla en `POST /api/contacto` con 403 en vez de 400 | La API no conoce el origen de la landing | `ORIGEN_LANDING=https://nitout.com` (paso 3.2) |
+| `humo` falla en `POST /api/contacto` con 501 | Falta `CORREO_CONTACTO` o el correo de la API | Paso 3.2 |
+| Errores de CSP en la consola con `cdn-cgi` o `cloudflareinsights` | Un ajuste de la zona mete scripts | Paso 3.7 |
+
+**Después:** cada push a `main` que toque algo que no sea un `.md` se
+despliega solo. Un pull request sólo pasa las comprobaciones.
 
 ### La mudanza de la app a app.nitout.com
 
-No es de este repo, pero va junto con la Parte 3:
+No es de este repo, pero va antes de la Parte 3:
 
 - [ ] API: `ORIGEN_WEB=https://app.nitout.com`, `GOOGLE_REDIRECT_URI=https://app.nitout.com/api/sesion/google/callback`.
 - [ ] Google Cloud: añadir `https://app.nitout.com` en orígenes y redirecciones del cliente web.

@@ -1,0 +1,32 @@
+// nit out · landing en Cloudflare Workers (archivos estáticos + un Worker
+// pequeño para /api/*). Lo despliega la CI (.github/workflows/landing.yml)
+// con `wrangler deploy --domain <DOMINIO>`: el dominio NO va aquí, va en la
+// variable DOMINIO de GitHub, para poder cambiarlo sin tocar código.
+{
+  "name": "nitout-landing",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-10-01",
+
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    // 404.html propia (la de «aquí no hay fiesta») para lo que no existe.
+    "not_found_handling": "404-page",
+    // El Worker sólo se despierta para la API; lo demás lo sirve Cloudflare
+    // directamente (gratis, sin contar invocaciones).
+    "run_worker_first": ["/api/*"]
+  },
+
+  // Nada de nitout-landing.<cuenta>.workers.dev ni de URLs de vista previa
+  // públicas: la landing sólo existe en su dominio.
+  "workers_dev": false,
+  "preview_urls": false,
+
+  "vars": {
+    // A dónde reenvía el Worker las 4 rutas de la API. Misma zona que
+    // nitout.com: la API ve la IP real del visitante.
+    "API_ORIGEN": "https://app.nitout.com"
+  },
+
+  "observability": { "enabled": true }
+}
