@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>nit out · las fiestas de cerca, en un mapa</title>
+  <meta name="description" content="Verbenas, tardeos, sesiones, conciertos del ayuntamiento y manifestaciones cerca de ti, en un mapa. Si organizas fiestas, publícalas en nit out y vende entradas con QR.">
+  <link rel="canonical" href="https://nitout.com/">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#e3e1dc" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="nit out">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:url" content="https://nitout.com/">
+  <meta property="og:title" content="nit out · las fiestas de cerca, en un mapa">
+  <meta property="og:description" content="Mira qué pasa ahora a tu alrededor, toca una pegatina y escucha cómo suena.">
+  <meta property="og:image" content="https://nitout.com/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="El logo de nit out y pegatinas de fiestas sobre un mapa">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="icono.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icono-180.png">
+
+  <link rel="preload" href="fonts/nitout-rotulo-bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/landing.css">
+  <script type="module" src="js/inicio.js"></script>
+
+  <!-- Datos para buscadores. Es un bloque de datos, no se ejecuta: el CSP no lo bloquea. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://nitout.com/#organizacion",
+        "name": "nit out",
+        "url": "https://nitout.com/",
+        "logo": "https://nitout.com/icono-512.png",
+        "email": "hola@nitout.com"
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://nitout.com/#web",
+        "name": "nit out",
+        "url": "https://nitout.com/",
+        "inLanguage": "es-ES",
+        "publisher": { "@id": "https://nitout.com/#organizacion" }
+      },
+      {
+        "@type": "WebApplication",
+        "name": "nit out",
+        "url": "https://app.nitout.com/",
+        "applicationCategory": "LifestyleApplication",
+        "operatingSystem": "Web",
+        "description": "Mapa de fiestas locales: verbenas, tardeos, sesiones, conciertos y manifestaciones cerca de ti.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <!-- Iconos de nit out (kedada/DISENO.md): grid 24, trazo 2, currentColor.
+       Copiados del sprite de la app; si cambia uno allí, se cambia aquí. -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-ayuntamiento" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 5l9 4.5M4 9.5h16M6 12.5V18M10 12.5V18M14 12.5V18M18 12.5V18M3 20.5h18M12 5V2.2h3.2l-.9 1.1.9 1.1H12"/></symbol>
+    <symbol id="i-bar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 4h15L12 12.5zM12 12.5V20M8 20.5h8"/><circle cx="10" cy="7" r="1.3"/></symbol>
+    <symbol id="i-discoteca" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><circle cx="12" cy="13" r="7"/><path d="M5 13h14M6 9.4h12M6 16.6h12M12 6c-2.6 2-2.6 12 0 14M12 6c2.6 2 2.6 12 0 14M19.5 1.8v3.4M17.8 3.5h3.4"/></symbol>
+    <symbol id="i-pub" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h10v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z"/><path d="M15 11h2a2 2 0 0 1 2 2v2.5a2 2 0 0 1-2 2h-2"/><path d="M5 8c-.9-1.8.4-4 2.5-3.6C8.3 2.8 10.6 2.5 11.8 3.9 13.4 3.3 15.3 4.6 15 8"/><path d="M8.5 11.5v6M11.5 11.5v6"/></symbol>
+    <symbol id="i-casual" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.6 2.7-6.3 6-6.3s6 2.7 6 6.3"/><circle cx="16.8" cy="9" r="2.6"/><path d="M15.6 14c.4-.1.8-.1 1.2-.1 2.6 0 4.7 2.3 4.7 5.3"/></symbol>
+    <symbol id="i-manifestacion" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.2v3.6c0 .6.4 1 1 1H7l7.5 4.2V5L7 9.2H4.5c-.6 0-1 .4-1 1z"/><path d="M7 14.8 8.6 20h2.3l-1.3-4.3"/><path d="M18 9.2a4 4 0 0 1 0 5.6M20.6 6.6a7.6 7.6 0 0 1 0 10.8"/></symbol>
+    <symbol id="i-particular" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20.5 8.8 8.3l7 7z"/><path d="M13.5 3v2.4M19.3 4.8l-1.7 1.7M21 10.5h-2.4M15 8.8c.9-.9 1.9-.9 2.8 0M10.6 5.8c.1-1.2.8-2.1 2-2.5"/></symbol>
+    <symbol id="i-mas" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-menos" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"/></symbol>
+    <symbol id="i-tique" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h8.5a1.5 1.5 0 0 0 3 0H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-2.5a1.5 1.5 0 0 0-3 0H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM15 9.5v1M15 13.5v1"/></symbol>
+    <symbol id="i-cerrar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6.5 6.5 11 11M17.5 6.5l-11 11"/></symbol>
+    <symbol id="i-nota" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5.5l10-2V16"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-estrella" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z"/></symbol>
+    <symbol id="i-flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="i-reloj" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+    <symbol id="i-gente" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="8" r="3.5"/><path d="M3.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5M19 8v6M16 11h6"/></symbol>
+    <symbol id="i-camara" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.3l1.4-2h5.6l1.4 2h2.3A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="12.8" r="3.3"/></symbol>
+    <symbol id="i-mapa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6.5 9 4l6 2.5L20.5 4v13.5L15 20l-6-2.5-5.5 2.5zM9 4v13.5M15 6.5V20"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M8.5 5.8v12.4l10-6.2z"/></symbol>
+    <symbol id="i-pausa" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="5.5" width="4" height="13" rx="1"/><rect x="13.5" y="5.5" width="4" height="13" rx="1"/></symbol>
+    <symbol id="i-externo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></symbol>
+    <symbol id="i-reciclar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12V9a3 3 0 0 1 3-3h13M17 3l3 3-3 3M20 12v3a3 3 0 0 1-3 3H4M7 21l-3-3 3-3"/></symbol>
+    <symbol id="i-aviso" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 21 19.5H3zM12 10v4.2M12 17.2v.1"/></symbol>
+    <symbol id="i-qr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="M14 14h2v2M20 14v.01M14 20h.01M17 18v2h3v-3"/></symbol>
+    <symbol id="i-correo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="1.5"/><path d="m4.5 7 7.5 6 7.5-6"/></symbol>
+    <symbol id="i-movil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></symbol>
+    <symbol id="i-estrella-ya" viewBox="0 0 48 48"><path d="M24 1.5L28 6.3L33.8 3.7L35.3 9.8L41.6 10L40.4 16.1L45.9 19L42.2 24L45.9 29L40.4 31.9L41.6 38L35.3 38.2L33.8 44.3L28 41.7L24 46.5L20 41.7L14.2 44.3L12.7 38.2L6.4 38L7.6 31.9L2.1 29L5.8 24L2.1 19L7.6 16.1L6.4 10L12.7 9.8L14.2 3.7L20 6.3Z"/></symbol>
+  </svg>
+
+  <a class="saltar" href="#principal">Saltar al contenido</a>
+
+  <!-- ================================================================
+       Portada: un trozo de pared con pegatinas (DISENO.md → La idea)
+       ================================================================ -->
+  <header class="portada">
+    <div class="contenedor barra">
+      <a class="marca" href="/" aria-label="nit out, inicio"><span class="logo despega">nit out</span></a>
+      <nav class="menu" aria-label="Secciones">
+        <a href="#mapa">El mapa</a>
+        <a href="#organizar">Para organizar</a>
+        <a href="#contacto">Contacto</a>
+      </nav>
+      <a class="btn btn-negro btn-barra" href="https://app.nitout.com/">Abrir el mapa</a>
+    </div>
+
+    <div class="contenedor portada-cuerpo">
+      <div class="portada-texto">
+        <h1 class="titular">
+          <span class="nota-titular g1 despega">las fiestas</span>
+          <span class="nota-titular g2 despega">de cerca,</span>
+          <span class="nota-titular g3 despega">en un mapa.</span>
+        </h1>
+        <p class="entradilla">Verbenas, tardeos, sesiones, conciertos del ayuntamiento y manifestaciones: lo que pasa a tu alrededor, ahora y este finde. Toca una pegatina y suena la canción que eligió quien la organiza.</p>
+        <div class="acciones">
+          <a class="btn btn-negro btn-grande despega" href="https://app.nitout.com/"><svg class="ico" aria-hidden="true"><use href="#i-mapa"/></svg>Abrir el mapa</a>
+          <a class="btn btn-papel btn-grande despega" href="#organizar">Organizo fiestas</a>
+        </div>
+        <ul class="tiendas" aria-label="Apps para el móvil">
+          <li><a class="tienda despega" data-tienda="ios" aria-disabled="true"><svg class="ico" aria-hidden="true"><use href="#i-movil"/></svg><span><small class="tienda-pre">pronto en</small> App Store</span></a></li>
+          <li><a class="tienda despega" data-tienda="android" aria-disabled="true"><svg class="ico" aria-hidden="true"><use href="#i-movil"/></svg><span><small class="tienda-pre">pronto en</small> Google Play</span></a></li>
+        </ul>
+      </div>
+
+      <!-- Pegatinas sueltas: decoración, mismas piezas que el mapa de la app. -->
+      <div class="pared" aria-hidden="true">
+        <div class="pieza pz-a d1 despega">
+          <span class="nota-suelta rot-2"><svg class="ico"><use href="#i-nota"/></svg>Verbena de Sant Pere</span>
+          <span class="pegatina t-ayuntamiento ahora rot-1"><span class="vinilo estrella"><svg class="forma" viewBox="0 0 48 48"><use href="#i-estrella-ya"/></svg><svg class="ico"><use href="#i-ayuntamiento"/></svg></span></span>
+        </div>
+        <div class="pieza pz-b d3 despega"><span class="pegatina t-discoteca pronto rot-4"><span class="vinilo"><svg class="ico"><use href="#i-discoteca"/></svg></span></span></div>
+        <div class="pieza pz-c d5 despega solo-ancho"><span class="pegatina t-bar luego rot-0"><span class="vinilo"><svg class="ico"><use href="#i-bar"/></svg></span></span></div>
+        <div class="pieza pz-d d2 despega"><span class="pegatina t-manifestacion pronto rot-5"><span class="vinilo"><svg class="ico"><use href="#i-manifestacion"/></svg></span></span></div>
+        <div class="pieza pz-e d4 despega"><span class="pegatina t-pub pronto rot-3"><span class="vinilo"><svg class="ico"><use href="#i-pub"/></svg></span></span></div>
+        <div class="pieza pz-f d6 despega solo-ancho">
+          <span class="nota-suelta rot-4">Tardeo con vermú</span>
+          <span class="pegatina t-bar ahora rot-3"><span class="vinilo estrella"><svg class="forma" viewBox="0 0 48 48"><use href="#i-estrella-ya"/></svg><svg class="ico"><use href="#i-bar"/></svg></span></span>
+        </div>
+        <div class="pieza pz-g d7 despega"><span class="pegatina t-casual luego rot-2"><span class="vinilo"><svg class="ico"><use href="#i-casual"/></svg></span></span></div>
+        <div class="pieza pz-h d8 despega solo-ancho"><span class="pegatina t-particular luego rot-6"><span class="vinilo"><svg class="ico"><use href="#i-particular"/></svg></span></span></div>
+        <div class="pieza pz-i d9 despega">
+          <span class="tique t-discoteca">
+            <span class="tique-cuerpo"><b>Sesión hasta las 6</b><small>entrada general</small></span>
+            <span class="tique-matriz"><b>12 €</b></span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="principal">
+
+    <!-- ================================================================
+         El mapa de muestra
+         ================================================================ -->
+    <section class="seccion" id="mapa" aria-labelledby="mapa-titulo">
+      <div class="contenedor">
+        <div class="cabeza-seccion">
+          <h2 id="mapa-titulo">Así se ve</h2>
+          <p class="cabeza-texto">Elige ciudad. Lo que ves son fiestas publicadas en nit out; si por allí aún hay pocas, te enseñamos un ejemplo y lo pone bien grande.</p>
+        </div>
+
+        <div class="mapa-controles">
+          <div class="ciudades" role="group" aria-label="Ciudad">
+            <button type="button" class="chip" data-ciudad="reus" aria-pressed="true">Reus</button>
+            <button type="button" class="chip" data-ciudad="tarragona" aria-pressed="false">Tarragona</button>
+            <button type="button" class="chip" data-ciudad="salou" aria-pressed="false">Salou</button>
+            <button type="button" class="chip" data-ciudad="barcelona" aria-pressed="false">Barcelona</button>
+            <button type="button" class="chip" data-ciudad="madrid" aria-pressed="false">Madrid</button>
+          </div>
+          <div class="selector" role="group" aria-label="Qué fiestas ver">
+            <button type="button" data-modo="directo" aria-pressed="true">en directo</button>
+            <button type="button" data-modo="ejemplo" aria-pressed="false">ejemplo</button>
+          </div>
+        </div>
+
+        <div class="mapa-caja" id="mapa-caja">
+          <div class="mapa-lienzo" id="mapa-muestra" role="region" aria-label="Mapa de muestra con fiestas"></div>
+          <p class="mapa-espera" id="mapa-espera">Cargando el mapa…</p>
+          <p class="mapa-chapa" id="mapa-chapa" hidden></p>
+          <div class="mapa-zoom">
+            <button type="button" class="boton-redondo" id="zoom-mas" aria-label="Acercar"><svg class="ico" aria-hidden="true"><use href="#i-mas"/></svg></button>
+            <button type="button" class="boton-redondo" id="zoom-menos" aria-label="Alejar"><svg class="ico" aria-hidden="true"><use href="#i-menos"/></svg></button>
+          </div>
+          <div class="mapa-aviso" id="mapa-aviso" hidden></div>
+          <article class="ficha" id="ficha" hidden aria-live="polite"></article>
+          <a class="btn btn-negro mapa-abrir" href="https://app.nitout.com/">Abrir el mapa entero<svg class="ico" aria-hidden="true"><use href="#i-externo"/></svg></a>
+        </div>
+        <!-- Lo mismo que el mapa, en texto, para quien no lo ve. -->
+        <ul class="oculto-visual" id="lista-accesible" aria-label="Fiestas del mapa"></ul>
+
+        <ul class="leyenda" aria-label="Cómo se lee el mapa">
+          <li>
+            <span class="pegatina t-ayuntamiento ahora rot-2 leyenda-peg" aria-hidden="true"><span class="vinilo estrella"><svg class="forma" viewBox="0 0 48 48"><use href="#i-estrella-ya"/></svg><svg class="ico"><use href="#i-ayuntamiento"/></svg></span></span>
+            <p><b>Estrella</b>: está pasando ahora.</p>
+          </li>
+          <li>
+            <span class="pegatina t-discoteca pronto rot-4 leyenda-peg" aria-hidden="true"><span class="vinilo"><svg class="ico"><use href="#i-discoteca"/></svg></span></span>
+            <p><b>Círculo</b>: empieza pronto.</p>
+          </li>
+          <li>
+            <span class="pegatina t-bar luego rot-1 leyenda-peg" aria-hidden="true"><span class="vinilo"><svg class="ico"><use href="#i-bar"/></svg></span></span>
+            <p><b>Más pequeña</b>: es más tarde.</p>
+          </li>
+          <li>
+            <span class="nota-leyenda" aria-hidden="true"><svg class="ico"><use href="#i-nota"/></svg>Karaoke</span>
+            <p><b>Con nota</b>: tócala y suena su canción.</p>
+          </li>
+        </ul>
+        <ul class="tipos" aria-label="El color dice qué es">
+          <li class="t-ayuntamiento"><span class="pegatina mini" aria-hidden="true"><span class="vinilo"><svg class="ico"><use href="#i-ayuntamiento"/></svg></span></span>ayuntamiento</li>
+          <li class="t-bar"><span class="pegatina mini" aria-hidden="true"><span class="vinilo"><svg class="ico"><use href="#i-bar"/></svg></span></span>bar</li>
+          <li class="t-discoteca"><span class="pegatina mini" aria-hidden="true"><span class="vinilo"><svg class="ico"><use href="#i-discoteca"/></svg></span></span>discoteca</li>
+          <li class="t-pub"><span class="pegatina mini" aria-hidden="true"><span class="vinilo"><svg class="ico"><use href="#i-pub"/></svg></span></span>pub</li>
+          <li class="t-casual"><span class="pegatina mini" aria-hidden="true"><span class="vinilo"><svg class="ico"><use href="#i-casual"/></svg></span></span>casual</li>
+          <li class="t-manifestacion"><span class="pegatina mini" aria-hidden="true"><span class="vinilo"><svg class="ico"><use href="#i-manifestacion"/></svg></span></span>manifestación</li>
+          <li class="t-particular"><span class="pegatina mini" aria-hidden="true"><span class="vinilo"><svg class="ico"><use href="#i-particular"/></svg></span></span>particular</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         Tira de logos. La pinta js/logos.js: los de ejemplo nunca salen
+         en nitout.com, y sin JS no sale nada (ningún aval falso).
+         ================================================================ -->
+    <section class="seccion seccion-logos" id="organizan" aria-labelledby="logos-titulo" hidden>
+      <div class="contenedor cabeza-logos">
+        <h2 id="logos-titulo" class="titulo-pequeno">Organizan con nit out</h2>
+        <span class="pastilla pastilla-ejemplo" id="logos-ejemplo" hidden>logos de ejemplo</span>
+        <button type="button" class="btn btn-papel btn-pequeno" id="logos-pausa" aria-pressed="false"><svg class="ico" aria-hidden="true"><use href="#i-pausa"/></svg><span>Pausar</span></button>
+      </div>
+      <div class="tira" id="tira">
+        <ul class="tira-pista" id="tira-pista"></ul>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         Para organizar
+         ================================================================ -->
+    <section class="seccion noche" id="organizar" aria-labelledby="organizar-titulo">
+      <div class="contenedor">
+        <div class="cabeza-seccion">
+          <h2 id="organizar-titulo" class="titulo-grande">¿Tienes un bar, una sala o llevas las fiestas del pueblo?</h2>
+          <p class="cabeza-texto">Pon tus fiestas donde las mira la gente que sale. Una foto, la hora, el sitio y la canción: en dos minutos está en el mapa.</p>
+        </div>
+
+        <ul class="ganas">
+          <li>
+            <div class="ganas-pieza" aria-hidden="true">
+              <span class="pegatina t-bar pronto rot-1"><span class="vinilo"><svg class="ico"><use href="#i-bar"/></svg></span></span>
+              <svg class="ico ganas-flecha"><use href="#i-flecha"/></svg>
+              <span class="pegatina t-bar ahora rot-4"><span class="vinilo estrella"><svg class="forma" viewBox="0 0 48 48"><use href="#i-estrella-ya"/></svg><svg class="ico"><use href="#i-bar"/></svg></span></span>
+            </div>
+            <div>
+              <h3>Cuando empieza, tu pegatina se vuelve estrella</h3>
+              <p>Lo que está pasando ahora salta a la vista en el mapa. Quien está cerca lo ve sin buscarlo.</p>
+            </div>
+          </li>
+          <li>
+            <div class="ganas-pieza" aria-hidden="true">
+              <span class="nota-leyenda"><svg class="ico"><use href="#i-nota"/></svg>Tu fiesta</span>
+            </div>
+            <div>
+              <h3>Suena tu canción</h3>
+              <p>Eliges una de Spotify, YouTube, SoundCloud o Apple Music y suena cuando alguien toca tu pegatina. Así se sabe de qué va antes de llegar.</p>
+            </div>
+          </li>
+          <li>
+            <div class="ganas-pieza" aria-hidden="true">
+              <span class="tique t-discoteca tique-mini">
+                <span class="tique-cuerpo"><b>General</b></span>
+                <span class="tique-matriz"><b>12 €</b></span>
+              </span>
+              <span class="sello">dentro</span>
+            </div>
+            <div>
+              <h3>Entradas con QR, y la puerta con el móvil <span class="pastilla pastilla-pronto" id="venta-pronto" hidden>muy pronto</span></h3>
+              <p>Vendes entradas, listas y turnos con señal. Cada plaza lleva su QR y llega por correo. En la puerta, tu equipo lo escanea con la cámara del móvil, sin instalar otra app.</p>
+            </div>
+          </li>
+          <li>
+            <div class="ganas-pieza" aria-hidden="true">
+              <span class="pastilla pastilla-edicion"><svg class="ico"><use href="#i-reciclar"/></svg>2.ª edición</span>
+            </div>
+            <div>
+              <h3>La repites y conservas a tu gente</h3>
+              <p>Reciclas una fiesta que ya pasó con su ficha y sus fotos, y quien se apuntó a la anterior queda apuntado a la nueva.</p>
+            </div>
+          </li>
+        </ul>
+
+        <div class="planes-cabeza">
+          <h3 class="titulo-medio" id="planes-titulo">Lo que cuesta</h3>
+          <p>Pagas por fiestas a la vez. Todos los planes venden entradas, listas y señales; cuanto más alto, menos comisión.</p>
+        </div>
+        <ul class="planes" id="planes" aria-labelledby="planes-titulo">
+          <!-- js/planes.js lo rellena con GET /api/planes -->
+        </ul>
+        <p class="planes-error" id="planes-error" hidden>Ahora mismo no podemos enseñarte los precios. <a href="#contacto">Escríbenos</a> y te los pasamos.</p>
+
+        <div class="extras">
+          <div class="extra">
+            <h3>¿Ayuntamiento, comisión de fiestas, asociación o sindicato?</h3>
+            <p>Hay plan institucional por convenio, sin venta de entradas.</p>
+            <a class="btn btn-claro" href="#contacto" data-plan="institucional">Pedir el convenio</a>
+          </div>
+          <div class="extra" id="extra-anuncio">
+            <h3>¿Solo una fiesta?</h3>
+            <p>Te la publicamos nosotros <span id="precio-anuncio">por un precio cerrado</span>, una vez y sin plan.</p>
+            <a class="btn btn-claro" href="#contacto" data-plan="una">Pedir el anuncio</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         Contacto
+         ================================================================ -->
+    <section class="seccion" id="contacto" aria-labelledby="contacto-titulo">
+      <div class="contenedor contacto">
+        <div class="cabeza-seccion">
+          <h2 id="contacto-titulo">Cuéntanos qué montas</h2>
+          <p class="cabeza-texto">Te contestamos desde <a href="mailto:hola@nitout.com">hola@nitout.com</a>. Si lo prefieres, escríbenos ahí directamente.</p>
+        </div>
+
+        <form class="formulario" id="formulario" novalidate>
+          <div class="campo">
+            <label for="f-nombre">Tu nombre</label>
+            <input id="f-nombre" name="nombre" type="text" autocomplete="name" required maxlength="80">
+          </div>
+          <div class="campo">
+            <label for="f-organizacion">Organización</label>
+            <input id="f-organizacion" name="organizacion" type="text" autocomplete="organization" required maxlength="120" placeholder="Bar, sala, ayuntamiento…">
+          </div>
+          <div class="campo campo-select">
+            <label for="f-tipo">Qué es</label>
+            <select id="f-tipo" name="tipo" required>
+              <option value="">Elige uno</option>
+              <option value="bar">Bar o cafetería</option>
+              <option value="discoteca">Discoteca o sala</option>
+              <option value="pub">Pub</option>
+              <option value="ayuntamiento">Ayuntamiento</option>
+              <option value="asociacion">Comisión o asociación de fiestas</option>
+              <option value="colectivo">Sindicato o colectivo</option>
+              <option value="otro">Otra cosa</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="f-ciudad">Ciudad o pueblo</label>
+            <input id="f-ciudad" name="ciudad" type="text" autocomplete="address-level2" required maxlength="80">
+          </div>
+          <div class="campo">
+            <label for="f-correo">Correo</label>
+            <input id="f-correo" name="correo" type="email" autocomplete="email" inputmode="email" required maxlength="160">
+          </div>
+          <div class="campo">
+            <label for="f-telefono">Teléfono <span class="opcional">opcional</span></label>
+            <input id="f-telefono" name="telefono" type="tel" autocomplete="tel" inputmode="tel" maxlength="30">
+          </div>
+          <div class="campo campo-select">
+            <label for="f-plan">Qué te interesa <span class="opcional">opcional</span></label>
+            <select id="f-plan" name="plan">
+              <option value="">Aún no lo sé</option>
+              <option value="basico">Plan Básico</option>
+              <option value="medio">Plan Medio</option>
+              <option value="alto">Plan Alto</option>
+              <option value="institucional">Convenio institucional</option>
+              <option value="una">Una sola fiesta</option>
+            </select>
+          </div>
+          <div class="campo campo-ancho">
+            <label for="f-mensaje">Cuéntanos algo más <span class="opcional">opcional</span></label>
+            <textarea id="f-mensaje" name="mensaje" rows="4" maxlength="1000" placeholder="Qué fiestas hacéis, cada cuánto, si vendéis entradas…"></textarea>
+          </div>
+          <!-- Trampa para robots: una persona no la ve ni la rellena. -->
+          <div class="trampa" aria-hidden="true">
+            <label for="f-web">No rellenes esto</label>
+            <input id="f-web" name="web" type="text" tabindex="-1" autocomplete="off">
+          </div>
+          <div class="campo-ancho" id="turnstile"></div>
+          <div class="campo-ancho casilla">
+            <input id="f-acepto" name="acepto" type="checkbox" required>
+            <label for="f-acepto">Acepto que nit out use estos datos para contestarme.</label>
+          </div>
+          <p class="campo-ancho letra-pequena">Solo los usamos para responderte: llegan a nuestro correo y no se guardan en ninguna base de datos. Puedes pedir que los borremos en hola@nitout.com. Más en la <a href="https://app.nitout.com/privacidad">política de privacidad</a>.</p>
+          <div class="campo-ancho enviar">
+            <button type="submit" class="btn btn-negro btn-grande" id="f-enviar">Enviar mensaje</button>
+            <p class="estado-envio" id="f-estado" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+
+        <div class="enviado" id="enviado" hidden tabindex="-1">
+          <span class="sello sello-grande">enviado</span>
+          <h3>Mensaje enviado</h3>
+          <p id="enviado-texto">Te escribimos en cuanto lo leamos.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie noche">
+    <div class="contenedor pie-rejilla">
+      <div>
+        <span class="logo">nit out</span>
+        <p class="pie-lema">Las fiestas de cerca, en un mapa.</p>
+      </div>
+      <nav aria-label="Pie">
+        <ul class="pie-enlaces">
+          <li><a href="https://app.nitout.com/">Abrir el mapa</a></li>
+          <li><a href="#organizar">Para organizar</a></li>
+          <li><a href="#contacto">Contacto</a></li>
+          <li><a href="mailto:hola@nitout.com">hola@nitout.com</a></li>
+        </ul>
+      </nav>
+      <nav aria-label="Legal">
+        <ul class="pie-enlaces">
+          <li><a href="https://app.nitout.com/aviso-legal">Aviso legal</a></li>
+          <li><a href="https://app.nitout.com/privacidad">Privacidad</a></li>
+          <li><span class="tenue">Esta web no usa cookies.</span></li>
+        </ul>
+      </nav>
+    </div>
+    <p class="contenedor pie-firma tenue">© 2026 nit out</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,750 @@
+/* =====================================================================
+   nit out · landing (nitout.com)
+   Dirección "Pegatina": kedada/DISENO.md manda; lo propio, en DISENO.md.
+   Sin frameworks. Tokens arriba; luego piezas, de fuera a dentro.
+   CSP: nada de style="" en el HTML. Colores por tipo con .t-<tipo>,
+   giros con .rot-n y valores calculados sólo por CSSOM (--rx, --ry).
+   ===================================================================== */
+
+@font-face {
+  font-family: 'Nit Out Texto';
+  src: url('../fonts/nitout-texto-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Nit Out Texto';
+  src: url('../fonts/nitout-texto-bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Nit Out Rotulo';
+  src: url('../fonts/nitout-rotulo-bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light dark;
+
+  /* Paleta de la app (kedada/DISENO.md). Superficie y texto: cambian de noche. */
+  --papel: #ffffff;
+  --tinta: #161616;
+  --gris: #6b6964;
+  --claro: #efeeea;
+  --claro-2: #f7f6f3;
+  --linea: #e6e4df;
+  --linea-fuerte: #d4d1cb;
+  --hormigon: #e3e1dc;
+  --rojo-texto: #c41d22;
+  --foco: #2f6fe0;
+  --placeholder: #8f8c86;
+  --atribucion: rgba(255, 255, 255, 0.88);
+  /* Fijos: objetos que no cambian nunca (pegatinas, notas, logo, tique, QR). */
+  --blanco: #ffffff;
+  --negro: #161616;
+  --rojo: #e3262b;
+  --troquel-color: #ffffff;
+
+  --troquel: 3px;
+  --filo: 0 0 0 1px rgba(22, 22, 22, 0.1);
+  --pegada: 0 1px 2px rgba(22, 22, 22, 0.22), 0 4px 10px rgba(22, 22, 22, 0.12);
+  --levantada: 0 6px 10px rgba(22, 22, 22, 0.16), 0 14px 28px rgba(22, 22, 22, 0.18);
+  --sombra-estrella: drop-shadow(0 1px 1.5px rgba(22, 22, 22, 0.32));
+
+  --texto: 'Nit Out Texto', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --rotulo: 'Nit Out Rotulo', 'Nit Out Texto', system-ui, sans-serif;
+
+  --r-hoja: 20px;
+  --r-caja: 14px;
+  --r-campo: 12px;
+
+  --curva: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Propios de la landing */
+  --ancho: 1180px;
+  --margen: clamp(16px, 4vw, 40px);
+  --titular: clamp(44px, 7.2vw, 98px);
+  --seccion: clamp(64px, 10vw, 128px);
+}
+
+/* Noche (kedada/DISENO.md → Noche): sólo superficie, texto y sombras. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --papel: #1c1c1f;
+    --tinta: #f2f1ee;
+    --gris: #a3a09a;
+    --claro: #2a2a2e;
+    --claro-2: #242428;
+    --linea: #313136;
+    --linea-fuerte: #46464c;
+    --hormigon: #111113;
+    --rojo-texto: #ff6a6e;
+    --foco: #7aa7ff;
+    --placeholder: #7f7c77;
+    --atribucion: rgba(28, 28, 31, 0.85);
+    --troquel-color: #ecebe7;
+    --filo: 0 0 0 1px rgba(255, 255, 255, 0.12);
+    --pegada: 0 1px 2px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.4);
+    --levantada: 0 8px 14px rgba(0, 0, 0, 0.5), 0 18px 34px rgba(0, 0, 0, 0.45);
+    --sombra-estrella: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+  }
+}
+
+/* La sección de empresas y el pie van "de noche" también de día: los
+   componentes de dentro usan los mismos tokens y se ven bien sin tocarlos. */
+.noche {
+  --papel: #1c1c1f;
+  --tinta: #f2f1ee;
+  --gris: #a3a09a;
+  --claro: #2a2a2e;
+  --claro-2: #242428;
+  --linea: #313136;
+  --linea-fuerte: #46464c;
+  --rojo-texto: #ff6a6e;
+  --foco: #7aa7ff;
+  --placeholder: #7f7c77;
+  --troquel-color: #ecebe7;
+  --filo: 0 0 0 1px rgba(255, 255, 255, 0.12);
+  --pegada: 0 1px 2px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.4);
+  background: var(--negro);
+  color: var(--tinta);
+}
+@media (prefers-color-scheme: dark) {
+  .noche { background: #0d0d0f; }
+}
+
+/* Vinilos por tipo (coinciden con js/tipos.js y con la app). */
+.t-ayuntamiento { --c: #2f6fe0; --sobre: var(--blanco); }
+.t-bar { --c: #ff7a1a; --sobre: var(--negro); }
+.t-discoteca { --c: #ff4fa3; --sobre: var(--negro); }
+.t-pub { --c: #16a765; --sobre: var(--negro); }
+.t-casual { --c: #ffc21a; --sobre: var(--negro); }
+.t-manifestacion { --c: #7b4ce0; --sobre: var(--blanco); }
+.t-particular { --c: #12aeb0; --sobre: var(--negro); }
+
+/* Giro fijo de cada pegatina (igual que la app). */
+.rot-0 { --rot: -6deg; }
+.rot-1 { --rot: -3.5deg; }
+.rot-2 { --rot: -1.5deg; }
+.rot-3 { --rot: 2deg; }
+.rot-4 { --rot: 4deg; }
+.rot-5 { --rot: 6.5deg; }
+.rot-6 { --rot: 0deg; }
+
+/* =====================================================================
+   Base
+   ===================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 16px; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font-family: var(--texto);
+  font-size: 17px;
+  line-height: 1.55;
+  background: var(--papel);
+  color: var(--tinta);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+h1, h2, h3 { font-family: var(--rotulo); font-weight: 700; line-height: 1.08; margin: 0; letter-spacing: -0.015em; text-wrap: balance; }
+h2 { font-size: clamp(34px, 5vw, 56px); }
+h3 { font-size: 21px; line-height: 1.2; }
+p { margin: 0; text-wrap: pretty; }
+a { color: inherit; text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
+ul { margin: 0; padding: 0; list-style: none; }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+img, svg { display: block; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 3px solid var(--foco); outline-offset: 3px; border-radius: 6px; }
+b, strong { font-weight: 700; }
+
+.oculto-visual { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+.ico { width: 20px; height: 20px; flex: 0 0 auto; display: inline-block; vertical-align: middle; }
+.tenue { color: var(--gris); }
+.letra-pequena { font-size: 13.5px; line-height: 1.5; color: var(--gris); }
+
+.contenedor { width: 100%; max-width: calc(var(--ancho) + 2 * var(--margen)); margin-inline: auto; padding-inline: var(--margen); }
+.seccion { padding-block: var(--seccion); }
+
+.saltar {
+  position: fixed; left: 12px; top: -80px; z-index: 100;
+  background: var(--papel); color: var(--tinta); padding: 10px 18px; border-radius: 999px;
+  box-shadow: var(--filo), var(--pegada); font-family: var(--rotulo); font-weight: 700; text-decoration: none;
+}
+.saltar:focus { top: 12px; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
+
+/* =====================================================================
+   Botones: pegatinas (negra, papel) y pastillas
+   ===================================================================== */
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  min-height: 46px; padding: 10px 20px;
+  border-radius: 999px; border: 0;
+  font-family: var(--rotulo); font-weight: 700; font-size: 15px; line-height: 1.1; text-decoration: none; white-space: nowrap;
+  transition: transform 0.15s var(--curva), background 0.15s, box-shadow 0.2s;
+}
+.btn .ico { width: 19px; height: 19px; }
+.btn:active { transform: scale(0.97); }
+.btn-negro {
+  background: var(--negro); color: var(--blanco);
+  border: var(--troquel) solid var(--troquel-color); box-shadow: var(--filo), var(--pegada);
+}
+.btn-papel { background: var(--blanco); color: var(--negro); box-shadow: var(--filo), var(--pegada); }
+.btn-claro { background: var(--claro); color: var(--tinta); }
+.btn-claro:hover { background: var(--linea); }
+.btn-grande { min-height: 56px; padding: 12px 26px; font-size: 17px; }
+.btn-pequeno { min-height: 44px; padding: 8px 16px; font-size: 14px; }
+.btn[disabled] { opacity: 0.5; cursor: progress; }
+
+.pastilla {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: 999px;
+  font-family: var(--rotulo); font-weight: 700; font-size: 13px; line-height: 1.2; white-space: nowrap;
+  background: var(--claro); color: var(--tinta); font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+.pastilla .ico { width: 15px; height: 15px; }
+.pastilla-negra { background: var(--negro); color: var(--blanco); box-shadow: 0 0 0 2px var(--troquel-color), var(--pegada); }
+.pastilla-ejemplo { background: var(--negro); color: var(--blanco); }
+.pastilla-pronto { background: var(--rojo); color: var(--blanco); font-size: 12px; vertical-align: 0.2em; margin-left: 4px; }
+.pastilla-edicion { background: transparent; color: var(--tinta); box-shadow: inset 0 0 0 1.5px var(--tinta); font-size: 15px; padding: 7px 14px; }
+
+.boton-redondo {
+  width: 44px; height: 44px; border-radius: 50%; border: 0;
+  display: grid; place-items: center;
+  background: var(--papel); color: var(--tinta); box-shadow: var(--filo), var(--pegada);
+}
+.boton-redondo:hover { background: var(--claro-2); }
+
+.chip {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px;
+  min-height: 44px; padding: 0 16px; border-radius: 999px; border: 0;
+  background: var(--papel); color: var(--tinta);
+  font-family: var(--rotulo); font-weight: 700; font-size: 14.5px; white-space: nowrap;
+  box-shadow: var(--filo), var(--pegada);
+  transition: background 0.15s, color 0.15s;
+}
+.chip:hover { background: var(--claro-2); }
+.chip[aria-pressed='true'] { background: var(--tinta); color: var(--papel); }
+
+/* Selector de dos (como «cuándo» en la app): caja clara, la elegida en tinta. */
+.selector { display: inline-flex; padding: 4px; gap: 2px; border-radius: 999px; background: var(--claro); }
+.selector button {
+  min-height: 44px; padding: 0 16px; border: 0; border-radius: 999px; background: none; color: var(--gris);
+  font-family: var(--rotulo); font-weight: 700; font-size: 14px;
+}
+.selector button:hover { color: var(--tinta); }
+.selector button[aria-pressed='true'] { background: var(--tinta); color: var(--papel); }
+
+/* =====================================================================
+   Logo: pegatina negra torcida (la de la app)
+   ===================================================================== */
+
+.logo {
+  display: inline-block;
+  font: 700 26px/1 var(--rotulo); letter-spacing: -0.02em;
+  background: var(--negro); color: var(--blanco);
+  padding: 6px 13px 9px; border-radius: 12px; border: var(--troquel) solid var(--troquel-color);
+  --rot: -3deg; transform: rotate(var(--rot)); box-shadow: var(--filo), var(--pegada);
+}
+.marca { display: inline-block; text-decoration: none; border-radius: 14px; }
+
+/* =====================================================================
+   Pegatinas (la pieza firma de la app, igual que en kedada/app.css)
+   ===================================================================== */
+
+.pegatina { --t: 40px; position: relative; display: inline-block; width: var(--t); height: var(--t); flex: 0 0 auto; }
+.pegatina .vinilo {
+  position: absolute; inset: 0; border-radius: 50%;
+  display: grid; place-items: center; overflow: hidden;
+  background: var(--c, var(--gris)); color: var(--sobre, var(--blanco));
+  border: var(--troquel) solid var(--troquel-color);
+  box-shadow: var(--filo), var(--pegada);
+  transform: rotate(var(--rot, 0deg));
+}
+.pegatina .vinilo .ico { width: 54%; height: 54%; }
+.pegatina .vinilo.con-foto { background: var(--claro); }
+.pegatina .vinilo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Ahora: estrella de 14 puntas. El trazo y el relleno se heredan dentro del <use>. */
+.pegatina .vinilo.estrella { inset: calc(var(--t) * -0.19); border: 0; border-radius: 0; box-shadow: none; overflow: visible; background: none; }
+.vinilo.estrella .forma {
+  position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible;
+  fill: var(--c, var(--gris)); stroke: var(--troquel-color); stroke-width: 3; stroke-linejoin: round;
+  filter: var(--sombra-estrella);
+}
+.vinilo.estrella .ico { position: relative; width: 42%; height: 42%; }
+.vinilo.estrella.con-foto .forma { fill: var(--troquel-color); }
+.vinilo.estrella.con-foto img {
+  position: absolute; inset: 0;
+  clip-path: polygon(50% 9.2%, 57.2% 18.3%, 67.7% 13.2%, 70.3% 24.6%, 81.9% 24.5%, 79.3% 35.9%, 89.8% 40.9%, 82.5% 50%, 89.8% 59.1%, 79.3% 64.1%, 81.9% 75.5%, 70.3% 75.4%, 67.7% 86.8%, 57.2% 81.7%, 50% 90.8%, 42.8% 81.7%, 32.3% 86.8%, 29.7% 75.4%, 18.1% 75.5%, 20.7% 64.1%, 10.2% 59.1%, 17.5% 50%, 10.2% 40.9%, 20.7% 35.9%, 18.1% 24.5%, 29.7% 24.6%, 32.3% 13.2%, 42.8% 18.3%);
+}
+.pegatina.luego .vinilo { inset: calc(var(--t) * 0.1); }
+.chapa-tipo {
+  position: absolute; left: -4px; bottom: -4px;
+  width: calc(var(--t) * 0.46); height: calc(var(--t) * 0.46); min-width: 18px; min-height: 18px;
+  border-radius: 50%; display: grid; place-items: center;
+  background: var(--c); color: var(--sobre);
+  border: 2px solid var(--troquel-color); box-shadow: var(--filo), 0 1px 3px rgba(22, 22, 22, 0.3);
+}
+.chapa-tipo .ico { width: 62%; height: 62%; }
+.pegatina.mini { --t: 24px; --troquel: 0px; }
+.pegatina.mini .vinilo { box-shadow: none; }
+.pegatina.mini .vinilo .ico { width: 62%; height: 62%; }
+
+@keyframes pegar { from { transform: scale(1.15); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes balanceo {
+  0%, 100% { transform: rotate(calc(var(--rot, 0deg) - 6deg)); }
+  50% { transform: rotate(calc(var(--rot, 0deg) + 6deg)); }
+}
+
+/* Nota: la etiqueta blanca que va encima de la pegatina en el mapa. */
+.nota-suelta, .nota-leyenda {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 11px 7px; border-radius: 10px;
+  background: var(--blanco); color: var(--negro);
+  font: 700 13.5px/1.15 var(--rotulo); white-space: nowrap;
+  box-shadow: var(--filo), var(--pegada);
+  transform: rotate(calc(var(--rot, 0deg) * -0.5));
+}
+.nota-suelta .ico, .nota-leyenda .ico { width: 14px; height: 14px; }
+
+/* Tique de guardarropa (kedada/DISENO.md → Tique): recto, cuerpo y matriz. */
+.tique {
+  position: relative; display: inline-flex; align-items: stretch; white-space: nowrap;
+  border-radius: 10px; overflow: hidden;
+  box-shadow: var(--filo), var(--pegada);
+  font-family: var(--rotulo);
+}
+.tique-cuerpo { display: grid; align-content: center; gap: 2px; padding: 10px 14px; background: var(--blanco); color: var(--negro); }
+.tique-cuerpo b { font-size: 15px; line-height: 1.1; }
+.tique-cuerpo small { font: 400 12px/1.2 var(--texto); color: #6b6964; }
+.tique-matriz {
+  display: grid; place-items: center; padding: 10px 14px; min-width: 64px;
+  background: var(--c); color: var(--sobre);
+  border-left: 2px dashed var(--blanco);
+  font-variant-numeric: tabular-nums;
+}
+.tique-matriz b { font-size: 20px; }
+.tique::before, .tique::after {
+  content: ''; position: absolute; left: calc(100% - 64px - 7px); width: 12px; height: 12px; border-radius: 50%;
+  background: var(--fondo-muesca, var(--hormigon));
+}
+.tique::before { top: -6px; }
+.tique::after { bottom: -6px; }
+
+/* Sello de goma «dentro» (el de la muñeca, kedada/DISENO.md → QR). */
+.sello {
+  display: inline-block; padding: 3px 12px 5px;
+  border: 3px solid var(--tinta); border-radius: 10px;
+  font: 700 22px/1 var(--rotulo); color: var(--tinta);
+  transform: rotate(-8deg);
+}
+.sello-grande { font-size: 40px; padding: 6px 20px 9px; border-width: 4px; }
+
+/* =====================================================================
+   Despegar (detalle de cursor). js/despegar.js pone --rx y --ry por CSSOM.
+   Sólo con ratón y sin movimiento reducido.
+   ===================================================================== */
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .despega {
+    transition: transform 0.28s var(--curva), box-shadow 0.28s var(--curva), filter 0.28s var(--curva);
+    transform-origin: 50% 60%;
+    will-change: transform;
+  }
+  .despega.levantada {
+    transform: perspective(700px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-2px) rotate(var(--rot, 0deg)) scale(1.03);
+    transition-duration: 0.12s;
+  }
+  /* Lo que ya es una caja con sombra la levanta; las pegatinas sueltas, su vinilo. */
+  .logo.levantada, .nota-titular.levantada, .btn.levantada, .tienda.levantada { box-shadow: var(--filo), var(--levantada); }
+  .pieza.levantada .vinilo:not(.estrella) { box-shadow: var(--filo), var(--levantada); }
+  .pieza.levantada .forma { filter: drop-shadow(0 8px 10px rgba(22, 22, 22, 0.28)); }
+  .pieza.levantada .tique, .pieza.levantada .nota-suelta { box-shadow: var(--filo), var(--levantada); }
+}
+
+/* =====================================================================
+   Portada: pared de hormigón con pegatinas
+   ===================================================================== */
+
+.portada { background: var(--hormigon); padding-bottom: clamp(48px, 8vw, 96px); overflow: hidden; --fondo-muesca: var(--hormigon); }
+.barra { display: flex; align-items: center; gap: 20px; padding-top: 18px; padding-bottom: 8px; }
+.menu { display: flex; gap: 6px; margin-left: auto; }
+.menu a {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; border-radius: 999px;
+  font: 700 15px/1 var(--rotulo); text-decoration: none;
+}
+.menu a:hover { background: rgba(22, 22, 22, 0.06); }
+.btn-barra { margin-left: 8px; }
+
+.portada-cuerpo {
+  display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 24px;
+  align-items: center; padding-top: clamp(32px, 6vw, 72px);
+}
+
+/* El titular: tres notas pegadas. Son objetos: de noche siguen blancas. */
+.titular { font-size: var(--titular); line-height: 1; letter-spacing: -0.035em; display: grid; justify-items: start; gap: 0.08em; }
+.nota-titular {
+  display: inline-block;
+  padding: 0.06em 0.26em 0.14em;
+  border-radius: 0.14em;
+  background: var(--blanco); color: var(--negro);
+  box-shadow: var(--filo), var(--pegada);
+  transform: rotate(var(--rot));
+  white-space: nowrap;
+}
+.nota-titular.g1 { --rot: -2.5deg; }
+.nota-titular.g2 { --rot: 1.5deg; margin-left: 0.5em; }
+.nota-titular.g3 { --rot: -1deg; margin-left: 0.15em; }
+
+.entradilla { max-width: 34em; margin-top: clamp(26px, 4vw, 40px); font-size: clamp(17px, 1.5vw, 19px); }
+.acciones { display: flex; flex-wrap: wrap; gap: 12px 14px; margin-top: 30px; }
+.acciones .btn-negro { --rot: -2deg; transform: rotate(var(--rot)); }
+.acciones .btn-papel { --rot: 1deg; transform: rotate(var(--rot)); }
+
+.tiendas { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+.tienda {
+  display: inline-flex; align-items: center; gap: 10px;
+  min-height: 52px; padding: 8px 16px 8px 12px; border-radius: 12px;
+  background: var(--blanco); color: var(--negro); text-decoration: none;
+  box-shadow: var(--filo), var(--pegada);
+  font: 700 16px/1.05 var(--rotulo);
+}
+.tienda span { display: grid; }
+.tienda-pre { font: 400 12px/1.2 var(--texto); color: #6b6964; }
+.tienda .ico { width: 22px; height: 22px; }
+.tienda[aria-disabled='true'] { cursor: default; }
+
+/* Las pegatinas sueltas. Posición por clase (pz-a…); el retraso del pegado, d1…d9. */
+.pared { position: relative; height: clamp(380px, 46vw, 540px); }
+.pieza { position: absolute; display: grid; justify-items: center; gap: 8px; animation: pegar 0.2s var(--curva) backwards; }
+.d1 { animation-delay: 0.1s; } .d2 { animation-delay: 0.17s; } .d3 { animation-delay: 0.24s; }
+.d4 { animation-delay: 0.31s; } .d5 { animation-delay: 0.38s; } .d6 { animation-delay: 0.45s; }
+.d7 { animation-delay: 0.52s; } .d8 { animation-delay: 0.59s; } .d9 { animation-delay: 0.66s; }
+.pieza .pegatina { --troquel: 4px; }
+.pz-a { top: 2%; left: 30%; } .pz-a .pegatina { --t: 118px; }
+.pz-d { top: 3%; left: 78%; } .pz-d .pegatina { --t: 64px; }
+.pz-f { top: 30%; left: 0; } .pz-f .pegatina { --t: 74px; }
+.pz-e { top: 33%; left: 72%; } .pz-e .pegatina { --t: 82px; }
+.pz-b { top: 50%; left: 38%; } .pz-b .pegatina { --t: 94px; }
+.pz-i { top: 76%; left: 2%; } .pz-i .tique { --rot: 5deg; transform: rotate(var(--rot)); }
+.pz-c { top: 77%; left: 66%; } .pz-c .pegatina { --t: 70px; }
+.pz-g { top: 60%; left: 86%; } .pz-g .pegatina { --t: 54px; }
+.pz-h { top: 90%; left: 46%; } .pz-h .pegatina { --t: 46px; }
+
+/* =====================================================================
+   Cabeza de cada sección
+   ===================================================================== */
+
+.cabeza-seccion { display: grid; gap: 16px; max-width: 44em; margin-bottom: clamp(28px, 4vw, 44px); }
+.cabeza-texto { font-size: clamp(17px, 1.4vw, 19px); color: var(--gris); max-width: 38em; }
+.cabeza-texto a { color: var(--tinta); }
+.titulo-grande { font-size: clamp(36px, 5.6vw, 64px); max-width: 15em; }
+.titulo-medio { font-size: clamp(28px, 3.4vw, 40px); }
+.titulo-pequeno { font-size: clamp(22px, 2.4vw, 28px); }
+
+/* =====================================================================
+   Mapa de muestra
+   ===================================================================== */
+
+.mapa-controles { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 18px; }
+.ciudades { display: flex; gap: 8px; min-width: 0; max-width: 100%; overflow-x: auto; padding: 4px 4px 8px; margin: -4px -4px -8px; scrollbar-width: none; }
+.ciudades::-webkit-scrollbar { display: none; }
+
+.mapa-caja {
+  position: relative; height: clamp(440px, 64vh, 640px);
+  border-radius: var(--r-hoja); overflow: hidden;
+  background: var(--hormigon);
+  box-shadow: var(--filo), var(--pegada);
+  isolation: isolate;
+}
+.mapa-lienzo { position: absolute; inset: 0; z-index: 0; background: var(--hormigon); }
+.mapa-espera { position: absolute; inset: 0; display: grid; place-items: center; color: var(--gris); font-family: var(--rotulo); z-index: 1; }
+.mapa-chapa { position: absolute; top: 14px; left: 14px; z-index: 5; margin: 0; }
+.mapa-zoom { position: absolute; top: 14px; right: 14px; z-index: 5; display: grid; gap: 8px; }
+.mapa-abrir { position: absolute; right: 14px; bottom: 26px; z-index: 5; --rot: -2deg; transform: rotate(var(--rot)); }
+.mapa-aviso {
+  position: absolute; left: 50%; top: 50%; z-index: 4; transform: translate(-50%, -50%);
+  width: min(360px, calc(100% - 32px)); padding: 18px 20px; border-radius: var(--r-caja);
+  background: var(--papel); box-shadow: var(--filo), var(--pegada);
+  display: grid; gap: 12px; justify-items: start;
+}
+.mapa-aviso p { font-size: 15.5px; }
+
+/* Leaflet dentro de la caja */
+.leaflet-container { background: var(--hormigon); font-family: var(--texto); }
+.capa-osm { filter: grayscale(1) contrast(0.95) brightness(1.04); }
+@media (prefers-color-scheme: dark) { .capa-osm { filter: invert(1) hue-rotate(180deg) grayscale(0.7) brightness(0.8) contrast(0.9); } }
+.leaflet-control-attribution {
+  background: var(--atribucion) !important; color: var(--gris) !important; font-size: 10.5px !important;
+  border-radius: 8px 0 0 0; padding: 1px 8px !important;
+}
+.leaflet-control-attribution a { color: var(--tinta) !important; }
+.leaflet-marker-pane svg { z-index: auto; }
+.peg-envoltorio { background: none; border: 0; }
+.peg-mapa { position: relative; width: 44px; height: 44px; cursor: pointer; }
+.peg-mapa .pegatina { --t: 42px; position: absolute; inset: 1px; transition: transform 0.2s var(--curva); animation: pegar 0.22s var(--curva) backwards; }
+.peg-nota {
+  position: absolute; bottom: calc(100% + 8px); left: 50%;
+  display: block; max-width: 190px; width: max-content;
+  padding: 6px 10px 7px; border-radius: 10px;
+  background: var(--papel); color: var(--tinta);
+  font: 700 12.5px/1.15 var(--rotulo);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  box-shadow: var(--filo), var(--pegada);
+  transform: translateX(calc(-50% + var(--dx, 0px))) rotate(calc(var(--rot, 0deg) * -0.5));
+  transform-origin: 50% 100%;
+  pointer-events: none;
+}
+.peg-nota .ico { width: 13px; height: 13px; margin: -2px 4px 0 0; }
+.peg-mapa.ahora .peg-nota { bottom: calc(100% + 15px); }
+.peg-mapa.luego .peg-nota { bottom: calc(100% + 4px); }
+.peg-mapa.sin-nota .peg-nota { display: none; }
+.leaflet-marker-icon:hover .peg-mapa .pegatina { transform: scale(1.08); }
+.peg-mapa.elegida .pegatina { transform: scale(1.2); }
+.leaflet-marker-icon:focus-visible { outline: none; }
+.leaflet-marker-icon:focus-visible .pegatina { outline: 3px solid var(--foco); outline-offset: 5px; border-radius: 50%; }
+.peg-mapa.sonando .vinilo { animation: balanceo 1.4s ease-in-out infinite; }
+
+/* Ficha pequeña: hoja abajo en el móvil, tarjeta a la izquierda en el ordenador. */
+.ficha {
+  position: absolute; z-index: 6; left: 14px; bottom: 14px;
+  width: min(360px, calc(100% - 28px));
+  padding: 18px 18px 16px; border-radius: var(--r-caja);
+  background: var(--papel); color: var(--tinta);
+  box-shadow: var(--filo), 0 10px 34px rgba(22, 22, 22, 0.22);
+  display: grid; gap: 12px;
+  animation: subir 0.22s var(--curva);
+}
+@keyframes subir { from { transform: translateY(12px); opacity: 0; } }
+.ficha-arriba { display: flex; gap: 14px; align-items: center; padding-right: 40px; }
+.ficha-arriba .pegatina { --t: 58px; --troquel: 3px; }
+.ficha h3 { font-size: 19px; }
+.ficha-chapas { display: flex; flex-wrap: wrap; gap: 6px; }
+.ficha-chapas .pastilla-tipo { background: var(--c); color: var(--sobre); }
+.ficha-chapas .pastilla-ahora { background: var(--rojo); color: var(--blanco); }
+.ficha-lineas { display: grid; gap: 6px; font-size: 14.5px; color: var(--gris); }
+.ficha-lineas li { display: flex; gap: 8px; align-items: center; }
+.ficha-lineas .ico { width: 17px; height: 17px; color: var(--tinta); }
+.ficha-cerrar { position: absolute; top: 10px; right: 10px; }
+.ficha .btn { justify-self: start; }
+.ficha-ejemplo { font-size: 13.5px; color: var(--gris); }
+
+.leyenda { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px 28px; margin-top: 30px; }
+.leyenda li { display: flex; align-items: center; gap: 14px; font-size: 15.5px; }
+.leyenda-peg { --t: 42px; margin: 6px; }
+.leyenda .nota-leyenda { --rot: 2deg; }
+.tipos { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 22px; font-family: var(--rotulo); font-weight: 700; font-size: 14px; color: var(--gris); }
+.tipos li { display: inline-flex; align-items: center; gap: 7px; }
+
+/* =====================================================================
+   Tira de logos: pegatinas blancas con el logo en tinta
+   ===================================================================== */
+
+.seccion-logos { padding-block: 0 var(--seccion); }
+.cabeza-logos { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-bottom: 22px; }
+.cabeza-logos .btn { margin-left: auto; }
+.tira {
+  overflow: hidden; padding-block: 14px;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+.tira-pista { display: flex; gap: 22px; width: max-content; animation: deslizar 46s linear infinite; padding-inline: 11px; }
+.tira:hover .tira-pista, .tira.pausada .tira-pista, .tira:focus-within .tira-pista { animation-play-state: paused; }
+@keyframes deslizar { to { transform: translateX(-50%); } }
+.logo-peg {
+  flex: 0 0 auto; display: grid; place-items: center;
+  height: 84px; padding: 0 26px; border-radius: var(--r-caja);
+  background: var(--blanco);
+  box-shadow: var(--filo), var(--pegada);
+  transform: rotate(var(--rot, 0deg));
+}
+.logo-peg img { height: 42px; width: auto; }
+@media (prefers-reduced-motion: reduce) {
+  .tira { -webkit-mask-image: none; mask-image: none; overflow-x: auto; }
+  .tira-pista { animation: none; flex-wrap: wrap; width: auto; max-width: calc(var(--ancho) + 2 * var(--margen)); margin-inline: auto; padding-inline: var(--margen); }
+  .tira-pista [aria-hidden='true'] { display: none; }
+  #logos-pausa { display: none; }
+}
+
+/* =====================================================================
+   Para organizar (sección de noche)
+   ===================================================================== */
+
+.noche .cabeza-texto { color: var(--gris); }
+.ganas { display: grid; border-top: 1px solid var(--linea); margin-bottom: clamp(56px, 8vw, 96px); }
+.ganas li {
+  display: grid; grid-template-columns: 236px minmax(0, 1fr); gap: 28px; align-items: center;
+  padding-block: 26px; border-bottom: 1px solid var(--linea);
+}
+.ganas h3 { font-size: clamp(21px, 2.2vw, 26px); }
+.ganas p { margin-top: 8px; color: var(--gris); max-width: 36em; }
+.ganas-pieza { display: flex; align-items: center; gap: 12px; min-height: 76px; --fondo-muesca: var(--negro); }
+.ganas-pieza > * { flex: 0 0 auto; }
+.ganas-pieza .pegatina { --t: 48px; margin: 8px; }
+.ganas-flecha { width: 22px; height: 22px; color: var(--gris); }
+.ganas-pieza .nota-leyenda { --rot: -3deg; font-size: 15px; }
+.ganas-pieza .tique { --rot: -3deg; transform: rotate(var(--rot)); }
+.ganas-pieza .sello { font-size: 17px; border-width: 2.5px; }
+.tique-mini .tique-cuerpo { padding: 9px 12px; }
+.tique-mini .tique-matriz { min-width: 56px; padding: 9px 10px; }
+.tique-mini .tique-matriz b { font-size: 17px; }
+.tique-mini::before, .tique-mini::after { left: calc(100% - 56px - 7px); }
+@media (prefers-color-scheme: dark) { .ganas-pieza { --fondo-muesca: #0d0d0f; } }
+
+.planes-cabeza { display: grid; gap: 10px; margin-bottom: 24px; max-width: 40em; }
+.planes-cabeza p { color: var(--gris); }
+.planes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.plan {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 20px; align-items: start;
+  padding: 22px 22px 20px; border-radius: var(--r-caja); background: var(--claro);
+}
+.plan-cifra { display: grid; justify-items: center; min-width: 64px; padding-top: 2px; }
+.plan-cifra b { font: 700 54px/0.9 var(--rotulo); font-variant-numeric: tabular-nums; letter-spacing: -0.03em; }
+.plan-cifra span { font: 700 12.5px/1.2 var(--rotulo); color: var(--gris); margin-top: 6px; white-space: nowrap; }
+.plan h4 { margin: 0; font: 700 21px/1.1 var(--rotulo); }
+.plan-precio { margin-top: 4px; font: 700 28px/1.1 var(--rotulo); font-variant-numeric: tabular-nums; }
+.plan-precio small { font: 400 14px/1 var(--texto); color: var(--gris); margin-left: 3px; }
+.plan-lista { grid-column: 1 / -1; display: grid; gap: 7px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--linea-fuerte); font-size: 15px; }
+.plan-lista li { display: flex; gap: 9px; align-items: flex-start; }
+.plan-lista .ico { width: 17px; height: 17px; margin-top: 3px; color: var(--tinta); }
+.plan-lista .no { color: var(--gris); }
+.plan-lista .no .ico { color: var(--gris); }
+/* Huecos de bono: fiestas a la vez (kedada/DISENO.md → Planes). */
+.huecos { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 5px; margin-top: 14px; }
+.huecos i { width: 14px; height: 14px; border-radius: 50%; background: var(--tinta); }
+.huecos i.libre { background: none; box-shadow: inset 0 0 0 1.5px var(--gris); }
+.plan-pedir { grid-column: 1 / -1; justify-self: start; margin-top: 18px; }
+.planes-error { margin-top: 8px; color: var(--gris); }
+
+.extras { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
+.extra { display: grid; gap: 10px; align-content: start; justify-items: start; padding: 22px; border-radius: var(--r-caja); box-shadow: inset 0 0 0 1.5px var(--linea-fuerte); }
+.extra p { color: var(--gris); font-size: 16px; }
+.extra .btn { margin-top: 6px; }
+
+/* =====================================================================
+   Contacto
+   ===================================================================== */
+
+.contacto { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 32px 56px; align-items: start; }
+.contacto .cabeza-seccion { margin: 0; position: sticky; top: 24px; }
+.formulario { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 16px; }
+.campo { display: grid; gap: 7px; align-content: start; }
+.campo-ancho { grid-column: 1 / -1; }
+.campo label { font: 700 14.5px/1.2 var(--rotulo); }
+.opcional { font: 400 13px/1 var(--texto); color: var(--gris); margin-left: 4px; }
+.campo input, .campo select, .campo textarea {
+  width: 100%; min-height: 50px; padding: 12px 14px;
+  border: 0; border-radius: var(--r-campo); background: var(--claro); color: var(--tinta);
+  box-shadow: inset 0 0 0 1px var(--placeholder);
+  font-size: 16px; line-height: 1.35;
+  transition: box-shadow 0.15s, background 0.15s;
+}
+.campo textarea { resize: vertical; min-height: 120px; }
+.campo select { appearance: none; padding-right: 44px; cursor: pointer; }
+.campo-select { position: relative; }
+.campo-select::after {
+  content: ''; position: absolute; right: 18px; top: 43px; width: 8px; height: 8px;
+  border-right: 2px solid var(--tinta); border-bottom: 2px solid var(--tinta);
+  transform: rotate(45deg); pointer-events: none;
+}
+.campo input::placeholder, .campo textarea::placeholder { color: var(--placeholder); }
+.campo input:focus-visible, .campo select:focus-visible, .campo textarea:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--foco); background: var(--papel); }
+.campo [aria-invalid='true'] { box-shadow: inset 0 0 0 2px var(--rojo-texto); }
+.error-campo { font-size: 13.5px; color: var(--rojo-texto); }
+.trampa { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.casilla { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: flex-start; }
+.casilla label { flex: 1 1 0; min-width: 0; }
+.casilla .error-campo { flex-basis: 100%; margin-left: 34px; }
+.casilla input { width: 22px; height: 22px; margin: 2px 0 0; accent-color: var(--tinta); flex: 0 0 auto; }
+.casilla label { font-size: 15.5px; }
+.enviar { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 18px; margin-top: 4px; }
+.enviar .btn { --rot: -2deg; transform: rotate(var(--rot)); }
+.estado-envio { font-size: 15px; }
+.estado-envio.error { color: var(--rojo-texto); }
+.enviado { display: grid; gap: 14px; justify-items: start; padding: 28px; border-radius: var(--r-caja); background: var(--claro); }
+.enviado:focus { outline: none; }
+.enviado h3 { font-size: 26px; }
+
+/* =====================================================================
+   Pie
+   ===================================================================== */
+
+.pie { padding-block: 56px 32px; }
+.pie-rejilla { display: grid; grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr)); gap: 32px; }
+.pie .logo { font-size: 30px; }
+.pie-lema { margin-top: 18px; color: var(--gris); }
+.pie-enlaces { display: grid; gap: 4px; }
+.pie-enlaces a { display: inline-flex; align-items: center; min-height: 44px; font-family: var(--rotulo); font-weight: 700; text-decoration: none; }
+.pie-enlaces a:hover { text-decoration: underline; }
+.pie-enlaces span { display: inline-flex; min-height: 40px; align-items: center; font-size: 14.5px; }
+.pie-firma { margin-top: 40px; font-size: 13.5px; }
+
+/* =====================================================================
+   Responsive
+   ===================================================================== */
+
+@media (max-width: 1020px) {
+  .portada-cuerpo { grid-template-columns: 1fr; }
+  .pared { height: 230px; margin-top: 12px; }
+  .solo-ancho { display: none; }
+  .pz-a { top: 14%; left: 4%; } .pz-a .pegatina { --t: 88px; }
+  .pz-d { top: 0; left: 64%; } .pz-d .pegatina { --t: 54px; }
+  .pz-b { top: 26%; left: 42%; } .pz-b .pegatina { --t: 66px; }
+  .pz-e { top: 40%; left: 80%; } .pz-e .pegatina { --t: 56px; }
+  .pz-g { top: 84%; left: 6%; } .pz-g .pegatina { --t: 44px; }
+  .pz-i { top: 74%; left: auto; right: 0; }
+  .contacto { grid-template-columns: 1fr; }
+  .contacto .cabeza-seccion { position: static; }
+}
+
+@media (max-width: 760px) {
+  .menu { display: none; }
+  .btn-barra { margin-left: auto; min-height: 44px; padding: 8px 16px; font-size: 14px; }
+  .nota-titular.g2 { margin-left: 0.3em; }
+  .acciones .btn { flex: 1 1 auto; }
+  .ganas li { grid-template-columns: 1fr; gap: 14px; }
+  .ganas-pieza { min-height: 0; }
+  .mapa-controles { flex-direction: column; flex-wrap: nowrap; align-items: stretch; }
+  .selector { align-self: flex-start; }
+  .ciudades { -webkit-mask-image: linear-gradient(to right, #000 85%, transparent); mask-image: linear-gradient(to right, #000 85%, transparent); padding-right: 40px; }
+  .mapa-caja { height: 520px; border-radius: 16px; }
+  .mapa-abrir { left: 14px; right: auto; bottom: 22px; }
+  .ficha { left: 10px; right: 10px; bottom: 10px; width: auto; }
+  .formulario { grid-template-columns: 1fr; }
+  .pie-rejilla { grid-template-columns: 1fr 1fr; }
+  .pie-rejilla > :first-child { grid-column: 1 / -1; }
+  .logo-peg { height: 72px; padding: 0 20px; }
+  .logo-peg img { height: 36px; }
+}
+
+@media (max-width: 420px) {
+  .pared { height: 200px; }
+  .pz-a .pegatina { --t: 78px; }
+  .pz-i .tique-cuerpo b { font-size: 14px; }
+  .tiendas li { flex: 1 1 auto; }
+  .tienda { width: 100%; }
+}
+
+/* =====================================================================
+   Piezas sueltas que faltaban
+   ===================================================================== */
+
+.fila-aviso { display: flex; flex-wrap: wrap; gap: 8px; }
+.tira.fuera .tira-pista { animation-play-state: paused; }
+.gs-0 { --rot: -1.5deg; } .gs-1 { --rot: 1deg; } .gs-2 { --rot: 0deg; } .gs-3 { --rot: -0.6deg; } .gs-4 { --rot: 1.8deg; }
+
+/* 404 */
+.no-encontrada { min-height: 100vh; padding-block: 28px 64px; }
+.no-encontrada .titular { margin-top: clamp(48px, 10vw, 120px); }

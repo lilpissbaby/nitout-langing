@@ -1,0 +1,61 @@
+# nit out · landing (nitout.com)
+#
+#   cp .env.example .env     # a qué API se habla, dirección de la app, buscadores
+#   docker compose up -d
+#
+# Mismo patrón que kedada: sin puertos publicados, unido a la red externa
+# proxy_network. Delante va el proxy del homelab (VPS de pruebas) o
+# cloudflared (producción), en esa misma red.
+
+services:
+  landing:
+    image: nginx:1.27-alpine
+    container_name: nitout-landing
+    restart: unless-stopped
+    environment:
+      # Host de la API, sin esquema ni barra final (contenedor api-fiestas).
+      API_UPSTREAM: ${API_UPSTREAM:?Falta API_UPSTREAM en .env}
+      API_ESQUEMA: ${API_ESQUEMA:-http}
+      # A dónde llevan los botones «Abrir el mapa».
+      APP_URL: ${APP_URL:-https://app.nitout.com}
+      # "all" sólo en producción. Por defecto, que ningún buscador indexe pruebas.
+      ROBOTS: ${ROBOTS:-noindex, nofollow}
+      # La plantilla sólo puede leer estas variables (nada más del entorno).
+      # ($$ es un $ escapado para docker compose.)
+      NGINX_ENVSUBST_FILTER: "^(API_UPSTREAM|API_ESQUEMA|APP_URL|ROBOTS)$$"
+    volumes:
+      - ./public:/usr/share/nginx/html:ro
+      - ./nginx/landing.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ./nginx/cabeceras.conf:/etc/nginx/landing/cabeceras.conf:ro
+      - ./nginx/proxy-api.conf:/etc/nginx/landing/proxy-api.conf:ro
+      # Caché de /api/planes y de las fotos del mapa.
+      - landing_cache:/var/cache/nginx/landing
+    networks:
+      - proxy_network
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 128m
+    pids_limit: 100
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # Endurecimiento extra, el mismo que está pendiente en kedada: probarlo
+    # en el VPS de pruebas antes de activarlo en producción (README → Endurecer).
+    # read_only: true
+    # tmpfs: [/var/cache/nginx/client_temp, /var/run, /etc/nginx/conf.d, /tmp]
+    # cap_drop: [ALL]
+    # cap_add: [CHOWN, SETUID, SETGID, NET_BIND_SERVICE]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/healthz"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  landing_cache:
+
+networks:
+  proxy_network:
+    external: true

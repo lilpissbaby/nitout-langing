@@ -1,0 +1,1 @@
+Lee AGENTS.md antes de nada. Para cualquier cambio de interfaz, usa la skill `nitout-diseno` (y `nitout-landing` si existe); `kedada/DISENO.md` y `DISENO.md` mandan sobre cualquier otra skill de diseño.
