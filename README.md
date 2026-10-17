@@ -19,7 +19,7 @@ o las rutas de un sitio y del otro dejan de coincidir.
 
 - **HTML, CSS y JS a pelo.** Sin frameworks, sin build y sin CDN. Fuentes,
   Leaflet e iconos se sirven desde aquí.
-- **Mismo estilo que la app** (Pegatina). Manda `kedada/DISENO.md`; lo propio
+- **Mismo estilo que la app** (Pegatina). Manda `front-web/DISENO.md`; lo propio
   de la landing está en `DISENO.md`.
 - **Ligera.** La primera carga son unos 240 KB sin comprimir (110 KB son las
   tres fuentes). Leaflet y las teselas del mapa, lo que más pesa, sólo se

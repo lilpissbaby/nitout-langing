@@ -3,8 +3,8 @@
 Landing de nit out (`nitout.com`). Antes de tocar CSS, HTML, JS de interfaz,
 iconos, letras o textos:
 
-1. **Lee la skill `nitout-diseno`** (en la cuenta, o en `kedada/.agents/skills/nitout-diseno/SKILL.md`).
-2. **Lee `kedada/DISENO.md`** (manda) y `DISENO.md` de este repo (lo propio de la landing).
+1. **Lee la skill `nitout-diseno`** (en la cuenta, o en `front-web/.agents/skills/nitout-diseno/SKILL.md`).
+2. **Lee `front-web/DISENO.md`** (manda) y `DISENO.md` de este repo (lo propio de la landing).
 3. Si existe la skill `nitout-landing`, también.
 
 Reglas que no se negocian:

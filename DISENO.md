@@ -1,6 +1,6 @@
 # nit out · landing (nitout.com) · diseño
 
-La dirección visual de nit out es **Pegatina** y vive en `kedada/DISENO.md`:
+La dirección visual de nit out es **Pegatina** y vive en `front-web/DISENO.md`:
 paleta, letras, forma, iconos, voz. **Aquella manda**. Este fichero solo
 recoge lo que la landing añade o decide por su cuenta. Si un cambio aquí
 contradice el de la app, se dice antes de hacerlo.
@@ -30,7 +30,7 @@ La cabecera. El resto (mapa, logos, planes, formulario) va recto y sin adornos.
 
 ## Tokens
 
-Los de `kedada/public/css/app.css`, copiados tal cual en `css/landing.css`
+Los de `front-web/public/css/app.css`, copiados tal cual en `css/landing.css`
 (`--papel`, `--tinta`, `--gris`, `--claro`, `--hormigon`, `--rojo`, los siete
 vinilos `.t-<tipo>`, `--pegada`, `--filo`, radios). La landing solo añade:
 
@@ -83,7 +83,7 @@ Todo alineado a la izquierda. Nada centrado salvo los botones dentro de sus pega
   troquel; los logos en tinta. Se desliza sola y se para con «Pausar» (WCAG
   2.2.2), al pasar el ratón o con movimiento reducido. Los logos de ejemplo
   **no salen nunca en nitout.com** (`js/logos.js`).
-- **Tarjeta de plan** (la de `kedada/DISENO.md`): cifra de fiestas a la vez en
+- **Tarjeta de plan** (la de `front-web/DISENO.md`): cifra de fiestas a la vez en
   Rótulo grande con «a la vez» debajo y los **huecos** de bono. Datos de
   `GET /api/planes`.
 - **Tiendas**: pegatinas blancas «pronto en App Store / Google Play» sin los
